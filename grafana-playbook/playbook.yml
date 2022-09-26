@@ -1,0 +1,6 @@
+---
+- name: grafana installation
+  hosts: 10.0.0.180
+  become: yes
+  roles:
+      - grafana
