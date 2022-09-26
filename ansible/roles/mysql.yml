@@ -1,0 +1,51 @@
+---
+- name: Install MySQL for production ready server
+  user: vamsip
+  hosts: all
+  become: True
+  become_user: root
+  #   vars:
+  #  MySQL_root_pass: vamsi123
+  tasks:
+          # - name: Set MySQL root password before installing
+          # debconf: name="mysql-server" question="mysql-server/root_password" value="" vtype="password"
+          # - name: Confirm MySQL root password before installing
+          # debconf: name="mysql-server" question="mysql-server/root_password_again" value="" vtype="password"
+    - name: test1
+      apt:
+        package:
+            - mysql-server
+            - mysql-client
+              #          - mysql-python
+        state: present
+        force: yes
+        update_cache: yes
+        cache_valid_time: 3600
+        #   when: ansible_os_family == "Debian"
+        # - name: Deletes anonymous MySQL server user for localhost
+        # mysql_user: user="" state="absent" login_password="" login_user=root
+        - name: Secures the MySQL root user
+          mysql_user: user="root" password="vamsi123" host="{{item}}" login_password="vamsi123" login_user=root
+          with_items:
+        - 127.0.0.1
+        - 192.168.29.251  
+        - localhost
+        - ::1
+        - ""
+          # - name: Removes the MySQL test database
+          # mysql_db: db=test state=absent login_password="" login_user=root
+
+    - name: Create a new database called wordpress
+      mysql_db:
+        login_user: root
+        login_password: vamsi123
+        name: wordpress
+        state: present
+
+    - name: Configure new MySQL user called wpuser
+      mysql_user:
+        login_user: root
+        login_password: vamsi123
+        name: wp_user
+        password: vamsi1
+        priv: 'wordpress.*:ALL'

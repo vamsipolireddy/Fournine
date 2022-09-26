@@ -1,0 +1,16 @@
+---
+- name: install LAMP Stack
+  hosts: all
+  remote_user: vamsip
+  become: true
+  become_user: root
+  gather_facts: true
+
+- name: Include Apache
+  import_playbook: apache.yml
+
+- name: Include MySQL
+  import_playbook: mysql4.yml
+
+- name: Include MySQL
+  import_playbook: wordpress.yml

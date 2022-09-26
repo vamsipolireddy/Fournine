@@ -1,0 +1,58 @@
+---
+- hosts: all
+  user: root
+  become: true
+
+  vars:
+    - mysql_root_password: "vamsi123"
+    - mysql_db: "wordpress"
+    - mysql_user: "vamsi"
+    - mysql_password: "password123@"
+  tasks:
+    - name: install mysql
+      apt:
+         name: mysql-server,mysql-client,python3-pymysql
+         state: latest     
+# MySQL Configuration
+#    - name: Set the root password
+#      mysql_user:
+#        name: root
+#        password: "{{ mysql_root_password }}"
+#        login_unix_socket: /var/run/mysqld/mysqld.sock
+#      tags: [ mysql, mysql-root ]
+
+    - name: Remove all anonymous user accounts
+      mysql_user:
+        name: ''
+        host_all: yes
+        state: absent
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      tags: [ mysql ]
+
+    - name: Remove the MySQL test database
+      mysql_db:
+        name: test
+        state: absent
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      tags: [ mysql ]
+
+    - name: Creates database for WordPress
+      mysql_db:
+        name: "{{ mysql_db }}"
+        state: present
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      tags: [ mysql ]
+
+    - name: Create MySQL user for WordPress
+      mysql_user:
+        name: "{{ mysql_user }}"
+        password: "{{ mysql_password }}"
+        priv: "{{ mysql_db }}.*:ALL"
+        state: present
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      tags: [ mysql ]
+
